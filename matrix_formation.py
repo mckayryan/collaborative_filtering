@@ -12,8 +12,8 @@ from numpy import linalg as lla
 
 
 # In[8]:
-
-movies_data = pd.read_csv('/home/ryan/uni/machine_learning/project/data/ml-latest-small/%s.csv' % 'ratings')
+# must change this path 
+# movies_data = pd.read_csv('/home/ryan/uni/machine_learning/project/data/ml-latest-small/%s.csv' % 'ratings')
 movies_df = pd.DataFrame(movies_data)
 
 
