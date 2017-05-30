@@ -3,9 +3,18 @@ import numpy as npy
 import pandas as pd
 from sklearn.model_selection import ShuffleSplit
 from sklearn.model_selection import KFold
-
+from scipy.optimize import fmin_bfgs
+from scipy.optimize import minimize
+# from train_X_Theta_v1 import *
 
 random.seed()
+
+num_movies = 0
+num_users = 0
+num_features = 100
+training_rated = []
+training_rating = []
+lamb = 10
 
 class dataset(object):
 
@@ -116,6 +125,22 @@ def data_dict(rating=[], rated=[], index=[]):
 def print_df_details(df, name):
     print('***', name, '***', 'Shape: ', df.shape)
 
+def cost_function(w):
+    X = (w[:num_movies*num_features]).reshape(num_movies, num_features)
+    Theta = (w[num_movies*num_features:]).reshape(num_users, num_features)
+    J = (((X.dot(Theta.T)-training_rating)*training_rated)**2).sum()/2 + (Theta**2).sum()*lamb/2 + (X**2).sum()*lamb/2
+    print("J = ", J)
+    return J
+
+def grad_function(w):
+    X = (w[:num_movies*num_features]).reshape(num_movies, num_features)
+    Theta = (w[num_movies*num_features:]).reshape(num_users, num_features)
+    X_grad = ((X.dot(Theta.T)-training_rating)*training_rated).dot(Theta) + X*lamb
+    Theta_grad = (((X.dot(Theta.T)-training_rating)*training_rated).T).dot(X) + Theta*lamb
+    X_grad = X_grad.reshape(-1)
+    Theta_grad = Theta_grad.reshape(-1)
+    return npy.append(X_grad, Theta_grad)
+
 # sampling the data
 
 
@@ -138,12 +163,56 @@ def main():
     # for i in range(6):
     #     # t, v = kfold_validation_generator(d.train_sets[0]['rating'])
         # print len(len(t), len(v)
+    global num_features
+    num_features = 100
+
+    global num_movies
+    num_movies = d.master_df['size'][0]
+    X = npy.random.rand(num_movies, num_features).reshape(-1)
+
+    global num_users
+    num_users = d.master_df['size'][1]
+    Theta = npy.random.rand(num_users, num_features).reshape(-1)
+
+    w0 = npy.append(X, Theta)
 
     t_v_generator = kfold_validation_generator(d.train_sets[index]['index'], kfolds=6)
     for i, j in t_v_generator:
         train_index = d.train_sets[index]['index'][i]
         validation_index = d.train_sets[index]['index'][j]
         # then do something with this fold
+        train_df = d.df_from_index_list(index_list=train_index, df_size=d.master_df['size'])
+        global training_rating
+        training_rating = train_df['rating']
+        global training_rated
+        training_rated = train_df['rated']
+
+        validation_df = d.df_from_index_list(index_list=validation_index, df_size=d.master_df['size'])
+        validation_rating = validation_df['rating']
+        validation_rated = validation_df['rated']
+
+        res = minimize(cost_function, w0, method='CG', jac = grad_function, options={'maxiter': 300})
+
+        wopt = res.x
+        X = (wopt[:num_movies*num_features]).reshape(num_movies, num_features)
+        Theta = (wopt[num_movies*num_features:]).reshape(num_users, num_features)
+        print("X is : ", X)
+        print("Theta is : ", Theta)
+        print("Cost min = ", cost_function(npy.append(X.reshape(-1), Theta.reshape(-1))))
+        hypo = (X.dot(Theta.T)*validation_rated).reshape(-1)
+        tru = validation_rating.reshape(-1)
+        print("Error rate : ", abs(hypo.sum()-tru.sum())/tru.sum())
+        w0 = res.x
+        input("Press Enter to continue...")
+
+    test_rating = d.test_sets[index]['rating']
+    test_rated = d.test_sets[index]['rated']
+    hypo = (X.dot(Theta.T)*test_rated).reshape(-1)
+    tru = test_rating.reshape(-1)
+    print("Final error rate : ", abs(hypo.sum()-tru.sum())/tru.sum())
+
+    npy.set_printoptions(formatter={'float': lambda x: "{0:0.1f}".format(x)})
+    print("Cost min = ", cost_function(npy.append(X.reshape(-1), Theta.reshape(-1))))
 
 if __name__ == '__main__':
     import sys
