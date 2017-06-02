@@ -54,6 +54,34 @@ class dataset(object):
                     rated = df.astype(bool)
                 )
 
+    def temporal_split(self, dataset_index=None, test_split=0.2):
+        if dataset_index == None: dataset_index = len(self.train_sets)
+
+
+        temporal_sorted = self.raw_df.sort_values(by='timestamp', ascending=False)
+        test_index_list = list( range( int( len(temporal_sorted)*(1-test_split)), len(temporal_sorted)))
+        train_index_list = set(list(range(len(temporal_sorted)))) - set(test_index_list)
+
+
+        self.test_sets.insert(
+            dataset_index,
+            self.df_from_index_list(
+                index_list=test_index_list,
+                df_size=self.master_df['size']
+            )
+        )
+
+        self.train_sets.insert(
+            dataset_index,
+            self.df_from_index_list(
+                index_list=train_index_list,
+                df_size=self.master_df['size']
+            )
+        )
+
+        print_df_details(self.train_sets[dataset_index]['rating'],'temporal test_df')
+        print_df_details(self.test_sets[dataset_index]['rating'],' temporal train_df')
+
 
     def random_sample_split(self, dataset_index=None, test_split=0.2):
         if dataset_index == None: dataset_index = len(self.train_sets)
@@ -90,8 +118,8 @@ class dataset(object):
                 )
             )
 
-        print_df_details(self.train_sets[dataset_index]['rating'],'test_df')
-        print_df_details(self.test_sets[dataset_index]['rating'],'train_df')
+        print_df_details(self.train_sets[dataset_index]['rating'],'random sample test_df')
+        print_df_details(self.test_sets[dataset_index]['rating'],'random sample train_df')
 
         return dataset_index
 
@@ -126,12 +154,12 @@ def print_df_details(df, name):
 
 def main():
     d = dataset(path='./ml-latest-small/', dataset='ratings')
-    index = d.random_sample_split()
-    print d.train_sets[index]['size']
-    print (     pd.DataFrame(d.train_sets[index]['rating'])
-                .melt()
-                .nlargest(20, 'variable')
-        )
+    d.temporal_split(test_split=0.4)
+    # print d.train_sets[index]['size']
+    # print (     pd.DataFrame(d.train_sets[index]['rating'])
+    #             .melt()
+    #             .nlargest(20, 'variable')
+    #     )
     # for i in range(6):
     #     # t, v = kfold_validation_generator(d.train_sets[0]['rating'])
         # print len(len(t), len(v)

@@ -2,13 +2,13 @@
 
 import numpy as npy
 import pandas as pd
-from cost_plus_grad import cost_plus_grad
+#from cost_plus_grad import cost_plus_grad
 from numpy import linalg as lla
 from scipy.optimize import fmin_bfgs
 from scipy.optimize import minimize
 
 
-# must change this path 
+# must change this path
 movies_data = pd.read_csv('./ml-latest-small/%s.csv' % 'ratings')
 movies_df = pd.DataFrame(movies_data)
 
@@ -80,18 +80,27 @@ num_features = 200
 
 def cost_function(w):
 	X = (w[:num_movies*num_features]).reshape(num_movies, num_features)
+
 	Theta = (w[num_movies*num_features:]).reshape(num_users, num_features)
+
 	J = (((X.dot(Theta.T)-training_rating)*training_rated)**2).sum()/2 + (Theta**2).sum()*lamb/2 + (X**2).sum()*lamb/2
+
 	print("J = ", J)
 	return J
 
 def grad_function(w):
 	X = (w[:num_movies*num_features]).reshape(num_movies, num_features)
+
 	Theta = (w[num_movies*num_features:]).reshape(num_users, num_features)
+
 	X_grad = ((X.dot(Theta.T)-training_rating)*training_rated).dot(Theta) + X*lamb
+
 	Theta_grad = (((X.dot(Theta.T)-training_rating)*training_rated).T).dot(X) + Theta*lamb
+
 	X_grad = X_grad.reshape(-1)
+
 	Theta_grad = Theta_grad.reshape(-1)
+
 	return npy.append(X_grad, Theta_grad)
 
 def train_X_Theta(nf = 200, lb = 10):
@@ -112,7 +121,7 @@ def train_X_Theta(nf = 200, lb = 10):
 	X = (wopt[:num_movies*num_features]).reshape(num_movies, num_features)
 	Theta = (wopt[num_movies*num_features:]).reshape(num_users, num_features)
 	return X, Theta
-	
+
 
 # print(J)
 # print(X_grad)
@@ -144,5 +153,3 @@ if __name__ == '__main__':
 	print("Truth : ", tru[npy.nonzero(tru)])
 
 	print("Error rate : ", abs(hypo.sum()-tru.sum())/tru.sum())
-
-

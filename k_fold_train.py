@@ -1,3 +1,4 @@
+
 import random
 import numpy as npy
 import pandas as pd
@@ -20,7 +21,9 @@ class dataset(object):
 
     def __init__(self, path, dataset):
         self.raw_df = pd.DataFrame(pd.read_csv(path + '%s.csv' % dataset))
-
+        '''
+            create index values for each unique value of movieId
+        '''
         self.item_index = dict(
             zip(
                 sorted(self.raw_df.movieId.unique()),
@@ -48,7 +51,7 @@ class dataset(object):
 
         df = npy.zeros(df_size)
 
-        for index, data_index in enumerate(index_list):
+        for _, data_index in enumerate(index_list):
             try:
                 df[
                     self.item_index[
@@ -65,7 +68,7 @@ class dataset(object):
                     index = npy.array(index_list)
                 )
 
-
+        
     def random_sample_split(self, dataset_index=None, test_split=0.2):
         if dataset_index == None: dataset_index = len(self.train_sets)
 
