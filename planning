@@ -1,0 +1,50 @@
+cost function by gradient descent method => prediction matrix
+to make a prediction
+  user n, movie p
+  X - movies by feature
+  theta - user by feature
+  prediction matrix = X * theta
+  prediction = prediction matrix[n,p]
+
+normalisation
+
+nearest neighbour
+  find k nearest users from theta matrix using various distance metods: euclidean, cosine
+
+visualisation
+
+learning curve - features, size of training set (3 curves - overfitting, underfitting, optimal )
+lambda curve
+number of features
+precision, recall
+
+
+Report 
+
+sections:
+
+Introduction - Mixed
+
+Related work - Mixed
+
+Data preparation - Me
+  cleaning
+  expermental design
+  normalisation
+
+Implementation - Mixed
+  Algorithms
+  Parameter selection
+
+Experimental Evaluation - Steven
+
+Results - Mixed
+
+Future Work? - Me
+
+Conclusion
+
+References / Appendix
+
+
+Readme
