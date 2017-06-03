@@ -55,14 +55,26 @@ class dataset(object):
                 )
 
     def temporal_split(self, dataset_index=None, test_split=0.2):
+        '''
+            Temporal_split
+            Orders a dataset by 'timestamp' and partitions the most recent len(dataset)*test_split userId's as a test set and the reamaining len(dataset)*(1-test_split) as a training set
+            These sets are appended to the train_sets, test_sets array
+            Returns index of partitioned sets in train_sets, test_sets
+        '''
         if dataset_index == None: dataset_index = len(self.train_sets)
 
-
         temporal_sorted = self.raw_df.sort_values(by='timestamp', ascending=False)
-        test_index_list = list( range( int( len(temporal_sorted)*(1-test_split)), len(temporal_sorted)))
-        train_index_list = set(list(range(len(temporal_sorted)))) - set(test_index_list)
 
+        test_df = temporal_sorted.nlargest(int(len(temporal_sorted)*(test_split)), 'timestamp')
+        test_index_list = test_df['userId']
 
+        # Train and Test are disjoint partitions
+        train_index_list = set(temporal_sorted['userId']) - set(test_index_list)
+        '''
+            Append to test_sets
+            test ratings matrix: [ index(movieID), userID ]
+            test rated bool matrix: True when ratings > 1, False otherwise
+        '''
         self.test_sets.insert(
             dataset_index,
             self.df_from_index_list(
@@ -70,7 +82,11 @@ class dataset(object):
                 df_size=self.master_df['size']
             )
         )
-
+        '''
+            Append to train_sets
+            test ratings matrix: [ index(movieID), userID ]
+            test rated bool matrix: True when ratings > 1, False otherwise
+        '''
         self.train_sets.insert(
             dataset_index,
             self.df_from_index_list(
@@ -78,9 +94,9 @@ class dataset(object):
                 df_size=self.master_df['size']
             )
         )
-
-        print_df_details(self.train_sets[dataset_index]['rating'],'temporal test_df')
-        print_df_details(self.test_sets[dataset_index]['rating'],' temporal train_df')
+        return dataset_index
+        # print_df_details(self.train_sets[dataset_index]['rating'],'temporal test_df')
+        # print_df_details(self.test_sets[dataset_index]['rating'],'temporal train_df')
 
 
     def random_sample_split(self, dataset_index=None, test_split=0.2):
