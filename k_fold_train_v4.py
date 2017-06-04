@@ -386,7 +386,6 @@ def main():
 
     print_metrics(d.analysis_sets[index], "kfold mse + mae + holdout test set")
 
-''' you will need to change variable names below to match '''
 # with open('./records_full.txt', 'a') as f:
 #     s = "\n"+str(num_features)+"\t"+str(lamb)+"\t"+str(partial)+"\t"+str(train_error)+"\t"+str(cv_error)+"\t"+str(mse)
 #     f.write(s)

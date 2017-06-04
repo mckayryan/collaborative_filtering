@@ -1,6 +1,6 @@
 from k_fold_train_v4 import *
 
-def test_kNN(k_values, neighbours_df, test_df, train_df, split_type):
+def test_kNN(k_values, neighbours_df, test_df, train_df, title, split_type, test_split_propotion):
 
     pcs_mse = npy.empty(0)
     pcs_mae = npy.empty(0)
@@ -17,31 +17,31 @@ def test_kNN(k_values, neighbours_df, test_df, train_df, split_type):
         cs_mse = npy.insert(cs_mse, len(cs_mse), mean_square_error(cs_predict, truth))
         cs_mae = npy.insert(cs_mae, len(cs_mae), mean_absolute_error(cs_predict, truth))
 
+    folder_path = 'images/'
 
-
-    plot_title = split_type + " kNN Results: Pearson Correlation Similarity (PCS)"
+    plot_title = title + " Results Mean Square Error (MSE)"  + split_type + ' - ' + str(test_split_propotion) + " Holdout Proportion"
     plot_curve( title=plot_title,
                 ylim=None,
-                xlab="k Value", ylab="Error",
-                ploty_1=pcs_mse, plotx_1=k_values, plot_lab1="Mean Square Error (MSE)",
-                ploty_2=pcs_mae, plotx_2=k_values, plot_lab2="Mean Absolute Error (MAE)",
+                xlab="k Value", ylab="Mean Square Error (MSE)",
+                ploty_1=cs_mse, plotx_1=k_values, plot_lab1="Cosine Similarity (CS)",
+                ploty_2=pcs_mse, plotx_2=k_values, plot_lab2="Pearson Correlation Similarity (PCS)",
                 fillrange_1=0, fillrange_2=0
     )
 
     file_name = plot_title+".png"
-    plot.savefig(file_name, bbox_inches='tight')
+    plot.savefig(folder_path+file_name, bbox_inches='tight')
 
-    plot_title = split_type + " kNN Results: Cosine Similarity (CS)"
+    plot_title = title + " Results Mean Absolute Error (MAE)\n" + split_type + ' - ' + str(test_split_propotion) + " Holdout Proportion"
     plot_curve( title=plot_title,
                 ylim=None,
-                xlab="k Value", ylab="Error",
-                ploty_1=cs_mse, plotx_1=k_values, plot_lab1="Mean Square Error (MSE)",
-                ploty_2=cs_mae, plotx_2=k_values, plot_lab2="Mean Absolute Error (MAE)",
+                xlab="k Value", ylab="Mean Absolute Error (MAE)",
+                ploty_1=cs_mae, plotx_1=k_values, plot_lab1="Cosine Similarity (CS)",
+                ploty_2=pcs_mae, plotx_2=k_values, plot_lab2="Pearson Correlation Similarity (PCS)",
                 fillrange_1=0, fillrange_2=0
     )
 
     file_name = plot_title+".png"
-    plot.savefig(file_name, bbox_inches='tight')
+    plot.savefig(folder_path+file_name, bbox_inches='tight')
 
 def predict_kNN(k, neighbours_df, test_df, train_df):
 
@@ -116,7 +116,8 @@ def cosine_similarity(v1, v2):
 def main():
 
     d = dataset(path='./ml-latest-small/', dataset='ratings')
-    index = d.random_sample_split()
+
+    index = d.random_sample_split(test_split=0.2)
 
     X, Theta = train_model(
                     num_users=d.master_df['size'][1],
@@ -126,9 +127,9 @@ def main():
                 )
 
 
-    test_kNN([1,3,5,10,15,25], Theta, d.test_sets[index], d.train_sets[index], split_type="Ransom Split")
+    test_kNN([1,3,5,10,15,25], Theta, d.test_sets[index], d.train_sets[index], title="Latent Factor KNN", split_type="Random Split", test_split_propotion=0.2)
 
-    index = d.temporal_split()
+    index = d.temporal_split(test_split=0.2)
 
     X, Theta = train_model(
                     num_users=d.master_df['size'][1],
@@ -137,7 +138,7 @@ def main():
                     train_df=d.train_sets[index]
                 )
 
-    test_kNN([1,3,5,10,15,25], Theta, d.test_sets[index], d.train_sets[index], split_type="Temporal Split")
+    test_kNN([1,3,5,10,15,25], Theta, d.test_sets[index], d.train_sets[index], title="Latent Factor KNN", split_type="Temporal Split", test_split_propotion=0.2)
 
 
 if __name__ == '__main__':
