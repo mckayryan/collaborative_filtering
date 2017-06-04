@@ -98,7 +98,7 @@ We use k-fold cross validation (CV) to determine the proper number of features $
 By using the KFold function of sklearn's model\_selection library, we randomly sampled (time independent) and split the validation set into k folds and use each of them as a holdout testing set while the Latent Factor Model trains on the remaining folds. In our implementation, we take $k=5$ and use the mean of the Mean Squared Error (MSE) and Mean Absolute Error (MAE) from all iterations of our Cross Validation.
 
 \section{Experimental Evaluation}
-The evaluation metrics we considered are Mean Squared Error (MSE) and Mean Absolute Error (MAE) for rating predictions and Precision and Recall for our classification (Top N Recommender). We chose to use MAE as well as the common MSE as it is more sensitive to outliers and since we have only simple methods for dealing with the cold start problem we believed the comparison of results may be relevant.
+The evaluation metrics we considered are Mean Squared Error (MSE) and Mean Absolute Error (MAE) for rating predictions and Precision and Recall for our classification (Top N Recommender). We chose to use MAE as well as the common MSE as it is more sensitive to outliers and since we have only simple methods for dealing with the cold start problem (a movie with no ratings) we believed the comparison of results may be relevant.
 
 \subsection{Latent Factor Model}
 We randomly split the raw data of user-movie rating into training set (80\%) and test set (20\%), with the training set as a validation set we used k-fold cross validation with $k=5$. From the cross validation we determined the number of features $f$, regularization coefficient $\lambda$, produced a Learning Curve Figure \ref{fig:exampleFig1} and Receiver Operating Characteristic (ROC) curve Figure \ref{fig:exampleFig1}. 
@@ -116,17 +116,21 @@ The experiments conducted with our KNN implementation were to understand the eff
 
 \subsection{Results}
 
-For latent factor model, our system achieved a MSE of 0.9 and MAE of 0.5. The average accuracy of correct prediction on rated movies is 70\%. This is an amazing ratio because a majority of the user's interaction with movies has been correctly predicted. The ROC curve shows that the prediction is much better than random guess.
+For latent factor model, our system achieved a MSE of 0.9 and MAE of 0.5. The average accuracy of correct prediction on rated movies is 70\%. This is an amazing ratio because a majority of the user's interaction with movies has been correctly predicted. The ROC curve shows that the prediction is much better than random guess and significantly better than our KNN results.
 
 For KNN model using a random sample to partition the data we observed a MSE of ~1 (Figure \ref{fig:knn1}) and MAE of ~0.765 (Figure \ref{fig:knn2}) and using a temporal split of the data we observed a best MSE of ~1.16 (Figure \ref{fig:knn3}) and MAE of 0.84 (Figure \ref{fig:knn4}). We observed similar results for calculating similarity with cosine and pearson correlation measures. In all cases cosine measure was superior, particularly for lower values of k.
 
-Considering the effect of k on our metrics from Figures \ref{knn1} - \ref{knn4} we can conclude that they converge quite quickly and that k > 10 for the random split and k > 5 for the temporal split yielded no specific improvement. We should consider that with a larger dataset we will find a larger number and more specifically similar users and hence k may not converge so quickly. 
+Considering the effect of k on our metrics from Figures \ref{knn1} - \ref{knn4} we can conclude that they converge quite quickly and that k > 10 for the random split and k > 5 for the temporal split yielded no specific improvement. We should consider that with a larger dataset we will find a larger number and more specifically more similar users and hence k may not converge so quickly. 
 
-In regards to the temporal split convergence we must consider the temporal distribution of the data as movies could be rated at similar, as may users rate many movies at similar times. We hypothesise that this could enhance the cold start problem producing a higher error, but also producing a quicker convergence of k as a user in the test partition may have sparse entries in the training partition and would result in inaccurate similarity scores.    
- 
-\section{Future Work}
+In regards to the temporal split results we must consider the temporal distribution of the data as movies could be rated at similar, as may users rate many movies at similar times. We hypothesise that this could enhance the cold start problem producing a higher error. Considering the quicker convergence of k a user in the test partition may have sparse entries in the training partition and would result in inaccurate similarity scores.    
 
 \section{Conclusion}
+By implementing collaborative filtering, the most prolific set of algorithms used in recommender systems today, we sought to gain a working understanding of the nuts and bolts of what, how and why collaborative filtering is an effective recommendation and prediction tool. 
+
+We implemented a Latent Factor Model using a matrix factorisation algorithm with regularisation and a KNN Model that used the Latent features derived from the matrix factorisation to greatly reduce processing time over simple KNN, however its results were not superior to the Latent Factor Model. The Latent Factor Model produced impressive results considering the simplicity of its formulation with room for additional features to improve results further,
+
+By focusing on experimentation over algorithmic implementation we have created a foundation from which we can modify and expand with clear and useful evaluation results to guide decisions in a thoughtful and quantitative manner.
+
 
 %Bibliographic references must be unambiguous and uniform.  We recommend giving
 %the author names references in brackets, e.g. \cite{knuth:84},
