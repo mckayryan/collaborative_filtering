@@ -1,17 +1,21 @@
 import random
 import numpy as npy
 import pandas as pd
+import matplotlib.pyplot as plot
+
 from sklearn.model_selection import ShuffleSplit
 from sklearn.model_selection import KFold
+from sklearn.model_selection import learning_curve
+
 from scipy.optimize import fmin_bfgs
 from scipy.optimize import minimize
+from operator import itemgetter as ig
 # from train_X_Theta_v1 import *
 
 random.seed()
 
 num_features = 105
-lamb = 0.17
-num_kfold = 5
+lamb = 1.3
 partial = 0.15
 debug_level = 1
 
@@ -186,17 +190,31 @@ class dataset(object):
             'test_mse': test_mse, 'test_mae': test_mae
             }
 
-def get_kNN(k, neighbours_df, feature_vector, distance_function, *args):
+def plot_curve(title, ylim, xlab, ylab, plotx_1, ploty_1, plot_lab1, plotx_2=None, ploty_2=None, plot_lab2=None, fillrange_1=0, fillrange_2=0):
+    plot.figure()
+    plot.title(title)
 
+    if ylim is not None: plot.ylim(ylim)
 
+    plot.xlabel(xlab)
+    plot.ylabel(ylab)
 
-    return kNN_index
+    plot.grid()
 
-def euclidean_distance(v1, v2):
-    if len(v1) != len(v2):
-        raise ValueError("In euclidean_distance: Length of vector v1 and v2 do not match\n", "len(v1): ", len(v1), '\tlen(v2): ', len(v2))
-    print((((v1-v2)**2).sum())**(0.5))
-    # return (((v1-v2)**2).sum())**(0.5)
+    plot.plot(plotx_1, ploty_1, 'o-', color='r', label=plot_lab1)
+    if fillrange_1 > 0:
+        plot.fill_between(plotx_1, ploty_1 - fillrange_1, ploty_1 + fillrange_1, alpha=0.1, color='r')
+
+    # If we are plotting a second value
+    if plotx_2 is not None and ploty_2 is not None and plot_lab2 is not None:
+        plot.plot(plotx_2, ploty_2, 'o-', color='b', label=plot_lab2)
+        if fillrange_2 > 0:
+            plot.fill_between(plotx_2, ploty_2 - fillrange_2, ploty_2 + fillrange_2, alpha=0.1, color='b')
+
+    plot.legend(loc="best")
+
+    return plot
+
 
 def kfold_validation_generator(data, kfolds=6, randomise=True):
     """
@@ -210,7 +228,6 @@ def kfold_validation_generator(data, kfolds=6, randomise=True):
         yield train_index, validation_index
         # print(train_index, validation_index)
 
-
 def print_metrics(analysis_dict, title, raw_results=False):
     print  title,
     print "Analysis Results "
@@ -221,20 +238,21 @@ def print_metrics(analysis_dict, title, raw_results=False):
     if raw_results:
         print "Raw MSE Results:\t", analysis_dict['train_mse']
         print "Raw MAE Results:\t", analysis_dict['train_mae']
-    print "Mean MSE:\t", sum(analysis_dict['train_mse']) / analysis_dict['k']
-    print "Mean MAE:\t", sum(analysis_dict['train_mae']) / analysis_dict['k']
+    if analysis_dict['k'] > 0:
+        print "Mean MSE:\t", npy.mean(analysis_dict['train_mse'])
+        print "Mean MAE:\t", npy.mean(analysis_dict['train_mae'])
     # kfold testing metrics (averaged)
     print "Kfold Validation Set"
     if raw_results:
         print "Raw MSE Results:\t", analysis_dict['kfold_mse']
         print "Raw MAE Results:\t", analysis_dict['kfold_mae']
-    print "Mean MSE:\t", sum(analysis_dict['kfold_mse']) / analysis_dict['k']
-    print "Mean MAE:\t", sum(analysis_dict['kfold_mae']) / analysis_dict['k']
+    if analysis_dict['k'] > 0:
+        print "Mean MSE:\t", npy.mean(analysis_dict['kfold_mse'])
+        print "Mean MAE:\t", npy.mean(analysis_dict['kfold_mae'])
     # Test Holdout set metrics
     print "Test Holdout Set"
     print "Test MSE:\t", analysis_dict['test_mse']
     print "Test MAE:\t", analysis_dict['test_mae']
-
 
 def print_df_details(df, name):
     print('***', name, '***', 'Shape: ', df.shape)
@@ -275,7 +293,6 @@ def train_model(num_users, num_movies, num_features, train_df):
     X = (wopt[:num_movies*num_features]).reshape(num_movies, num_features)
     Theta = (wopt[num_movies*num_features:]).reshape(num_users, num_features)
     return X, Theta
-
 
 def test_prediction(X, Theta, df):
     hypo0 = (X.dot(Theta.T)*df['rated']).reshape(-1)
