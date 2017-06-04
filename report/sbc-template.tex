@@ -118,7 +118,11 @@ The experiments conducted with our KNN implementation were to understand the eff
 
 For latent factor model, our system achieved a MSE of 0.9 and MAE of 0.5. The average accuracy of correct prediction on rated movies is 70\%. This is an amazing ratio because a majority of the user's interaction with movies has been correctly predicted. The ROC curve shows that the prediction is much better than random guess.
 
-For KNN model using a random sample to partition the data we observed a MSE of ~1 and MAE of ~0.765 and using a temporal split of the data we observed a best MSE of ~1.16 and MAE of 0.84. We observed similar results for calculating similarity with cosine and pearson correlation measures. In all cases cosine measure was superior, particularly for lower values of k.
+For KNN model using a random sample to partition the data we observed a MSE of ~1 (Figure \ref{fig:knn1}) and MAE of ~0.765 (Figure \ref{fig:knn2}) and using a temporal split of the data we observed a best MSE of ~1.16 (Figure \ref{fig:knn3}) and MAE of 0.84 (Figure \ref{fig:knn4}). We observed similar results for calculating similarity with cosine and pearson correlation measures. In all cases cosine measure was superior, particularly for lower values of k.
+
+Considering the effect of k on our metrics from Figures \ref{knn1} - \ref{knn4} we can conclude that they converge quite quickly and that k > 10 for the random split and k > 5 for the temporal split yielded no specific improvement. We should consider that with a larger dataset we will find a larger number and more specifically similar users and hence k may not converge so quickly. 
+
+In regards to the temporal split convergence we must consider the temporal distribution of the data as movies could be rated at similar, as may users rate many movies at similar times. We hypothesise that this could enhance the cold start problem producing a higher error, but also producing a quicker convergence of k as a user in the test partition may have sparse entries in the training partition and would result in inaccurate similarity scores.    
  
 \section{Future Work}
 
