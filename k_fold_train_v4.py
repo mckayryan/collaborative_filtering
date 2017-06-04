@@ -312,7 +312,7 @@ def test_prediction(X, Theta, df):
 
 def main():
 
-    d = dataset(path='./ml-latest-small/', dataset='ratings')
+    d = dataset(path='./ml-latest/', dataset='ratings')
     index = d.random_sample_split()
 
     if debug_level:

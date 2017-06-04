@@ -1,4 +1,4 @@
-\documentclass[12pt]{article}
+ \documentclass[12pt]{article}
 
 \usepackage{sbc-template}
 
@@ -24,14 +24,9 @@
 
 \maketitle
 
-\begin{abstract}
-We present our study of recommender system's and user-item rating systems, i.e. user-movie rating system. We have focused on the most prolific algorithm in recommender systems, collaborative filtering, more specifically Latent Factor and K-Nearest-Neighbour (KNN) techniques for rating prediction and we establish a simple classification rule as a means for considering so called top N recommendations. In this report, we outline the implementation, experimentation and evaluation of our collaborative filtering solution and explore various methods to measure prediction accuracy based on experiments. 
-\end{abstract}
-
-
 \section{Introduction}
 
-Recommender system's have become very popular in recent times, implemented by many Internet giants to guide customers toward products they are likely to click on, watch, purchase or consume in general. One of the most successful recommendation algorithms is collaborative filtering.
+We present our study of recommender system's and user-item rating systems, i.e. user-movie rating system. We have focused on the most prolific algorithm in recommender systems, collaborative filtering, more specifically Latent Factor and K-Nearest-Neighbour (KNN) techniques for rating prediction and we establish a simple classification rule as a means for considering so called top N recommendations. In this report, we outline the implementation, experimentation and evaluation of our collaborative filtering solution and explore various methods to measure prediction accuracy based on experiments. 
 
 %In this project, our goal is to implement a version of collaborative filtering algorithm on a MovieLens user-movie rating dataset and do sufficient experiments to make the system work properly and give a reasonable prediction accuracy.
 %
@@ -80,7 +75,7 @@ To turn our matrix factorisation into prediction we take the inner product of $X
 
 \subsubsection{K-Nearest-Neighbor Model}
 
-We explore KNN as another method of prediction based on our Latent Factor model. Using $\theta$ matrix from our Latent Factor model we compute similarity of each user in our test set to the subset of users that rated the movie that we wish to predict for the test set user.  
+We explore KNN as another method of prediction based on our Latent Factor model. From the subset of users that rated the test set movie, we select the k most similar users to the test set user by the latent features from $\theta$ matrix with a similarity measure.
 \\ \\
 We compute "similarity" with two measures, Pearson Correlation and Cosine similarity as defined below.
 \\
@@ -90,7 +85,7 @@ $$r_{p} = \dfrac{ \sum_{i\in} (r_{x,i} - \bar{r_{x}})(r_{y,i} - \bar{r_{y}})}{\s
 Cosine Similarity is the cosine of the angle between user feature vectors x and y from $\theta$ matrix.
 $$r_{c} = \cos(\textbf{x},\textbf{y}) = \frac{\sum_{i} r_{x,i} r_{y,i} }{\sqrt{\sum_{i} r_{x,i}^2} \sqrt{\sum_{i} r_{y,i}^2}} $$
 \\
-From the subset of users that rated the test set movie, we select the k most similar users to the test set user by the latent features from $\theta$ matrix and the similarity measures described above. Our prediction for the test set users rating of a particular movie is the mean of the ratings given by its K nearest users. When no users had previously rated the movie from the test set, we took a simple average of all of the user in questions ratings. 
+Our prediction for the test set users rating of a particular movie is the mean of the ratings given by its K nearest users. When no users had previously rated the movie from the test set (cold start), we took a simple average of all of the user in questions ratings. 
 
 \subsection{K-fold Cross Validation}
 We use k-fold cross validation (CV) to determine the proper number of features $f$, the regularization coefficient $\lambda$ and do any other debugging.
