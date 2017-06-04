@@ -1,0 +1,13 @@
+\begin{thebibliography}{1}
+
+\bibitem{MF}
+Yehuda Koren, Robert Bell, and Chris Volinsky.
+\newblock Matrix factorization techniques for recommender systems, 2009.
+
+\bibitem{CF_Recsys_Survey}
+Michael~D. Ekstrand, John~T. Riedl, and Joseph~A. Konstan.
+\newblock Collaborative filtering recommender systems.
+\newblock {\em Foundations and Trends{\textregistered} in Human--Computer
+  Interaction}, 4(2):81--173, 2011.
+
+\end{thebibliography}
